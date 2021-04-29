@@ -1,0 +1,114 @@
+/*
+Gradle build file for implementation with GitHub's Autograder
+
+When adding the test on GitHub Classroom choose
+Java test case
+- Test Name: <whatever>
+- Setup Command: <leave blank>
+- Run Command: gradle test --tests <TestClass(no .java)>.<testMethod(only if you need it no ())>
+- Timeout: 10 min is fine.  I think this is more about the system.
+				However, I'd hate the system to run an infinite loop for 10 min.
+				But that's they're default so I'm sure it has safeguards for when
+				it runs out of memory.  HA!
+- Points: <whatever> note, currently it's all or nothing.  GitHub says it wants to add that later
+
+
+Many thanks to David Bradley <liberty-bradleyd> for giving me the starting point for all of this!
+I would not have gotten this far on my own!
+*/
+
+
+
+plugins {
+	id 'java'
+	id 'eclipse'  //not sure this is totally necessary.  But Gradle documentation seems to think so.
+}
+
+/*
+ * Without these, every time Gradle refreshes, all the 
+ * libraries are reset to whatever gradle wants and 
+ * JUnit5 library is removed.
+ * This may be an Eclipse only issue.
+ */
+sourceCompatibility = 10 
+targetCompatibility = 10
+
+repositories {
+	mavenCentral()
+}
+
+// Added implementation, because that was needed to compile the jUnit test case.
+dependencies {
+	//5.7.1 is just what version of jupiter i'm useing.  Change it to yours
+	testImplementation('org.junit.jupiter:junit-jupiter-api:5.7.1')
+	implementation('org.junit.jupiter:junit-jupiter-api:5.7.1')
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+}
+
+test {
+
+	useJUnitPlatform()  //must be here
+	
+	testLogging {
+		/*
+		Why i add STANDARD_OUT
+		
+		STANDARD_OUT will print everything that would normally go to the console
+		In my tests I switch Standard.out to store in a local variable so I can test
+		what they're printing.
+		I use a try-catch on the assert tests
+		If it throws AssertionError, I switch back to Standard.out and print hints as to why their code
+		may have failed.
+		Then I print
+		YOUR OUTPUT:
+		<student output>
+		HINT:
+		<my hint>
+		*/
+		events "PASSED", "SKIPPED", "FAILED", "STANDARD_OUT"
+		
+	}
+	
+	
+}
+/* Added the whole sourceSets section, so that the source and test files did NOT have to always follow this structure
+      main/java
+      test/java
+      
+      Eclipse puts them all in the src folder by default, so this sourceSets statement will handle where Eclipse puts 
+      them by default, as well as work with the folder structure expected by Gradle. 
+*/
+sourceSets {
+    main {
+        java {
+           	srcDirs = ["src","main/java"]
+		}
+    }
+    test {
+       	java {
+       	//my test classes are in a separate source folder srcTests
+       	//add src if that's where your's are	
+		srcDirs = ["src", "test/java"] 
+        }
+    }
+}
+
+/*  This is in here for debugging purposes. Not strictly needed. 
+    Gives some info on where gradle is currently looking for filess.
+*/
+task sourceSetProperties {
+    sourceSets {
+        main {
+            /*
+			 Below is commented out to reduce log clutter
+			 Still available if debugging is needed            
+             */
+            //println "java.srcDirs = ${java.srcDirs}"
+            //println "resources.srcDirs = ${resources.srcDirs}"
+            //println "java.files = ${java.files.name}"
+            //println "allJava.files = ${allJava.files.name}"
+            //println "resources.files = ${resources.files.name}"
+            //println "allSource.files = ${allSource.files.name}"
+        }
+    }
+}

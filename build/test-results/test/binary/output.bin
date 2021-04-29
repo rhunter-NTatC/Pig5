@@ -1,0 +1,8 @@
+Error:
+$Default Constructor did not set the
+number of faces to 6.
+Error:
+#Second Constructor did not set the
+"number of faces to the parameter.
+Roll test stopped.
+Fix constructors first!
